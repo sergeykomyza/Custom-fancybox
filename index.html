@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>custom fancybox vanilla js</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css">
+
+    <style>
+        .wrapper {
+            display: flex;
+        }
+
+        .item {
+            width: 200px;
+            cursor: pointer;
+        }
+
+        .item img {
+            width: 100%;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal--active {
+            display: flex;
+        }
+
+        .modal-body {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            padding: 10px;
+            background-color: #FFF;
+        }
+
+        .modal-slider {
+            width: 100%;
+            height: 100%;
+        }
+
+        .slide-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .slider-nav {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .slider-nav button {
+            cursor: pointer;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="modal">
+        <div class="modal-body animate__animated">
+            <div class="modal-slider">
+
+            </div>
+            <div class="slider-nav">
+                <button class="prev">
+                    < </button>
+                        <button class="next"> > </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="wrapper">
+        <div class="item">
+            <img src="https://i.pinimg.com/originals/47/15/67/471567c282d2e1c844fef39e63e0abba.jpg" alt="">
+        </div>
+
+        <div class="item">
+            <img src="https://images.hdqwalls.com/wallpapers/bthumb/resident-evil-2-2019-4k-5a.jpg" alt="">
+        </div>
+
+        <div class="item">
+            <img src="https://free4kwallpapers.com/uploads/originals/2020/05/02/game-art-wallpaper.jpg" alt="">
+        </div>
+
+        <div class="item">
+            <img src="https://xage.ru/media/posts/2019/8/26/26-minutes-of-gameplay-dying-light-2-in-4k-trailer_BOLSTko.jpg"
+                alt="">
+        </div>
+
+        <div class="item">
+            <img src="https://tes-game.ru/_nw/14/08884847.jpg" alt="">
+        </div>
+    </div>
+
+    <script>
+        const imgs = document.querySelectorAll('.item img');
+        const modal = document.querySelector('.modal');
+        const modalBody = document.querySelector('.modal-slider');
+        const next = document.querySelector('.next');
+        const prev = document.querySelector('.prev');
+        let slideIndex = 0;
+
+        imgs.forEach((item, itemIndex) => { // перебираем все картинки. item - картинка, itemIndex - ее индекс в коллекции
+            item.addEventListener('click', function () { // по клику на картинку
+                slideIndex = itemIndex; // заносим ее индекс в переменную slideIndex
+                modal.classList.add('modal--active'); // показываем окно
+                modal.querySelector('.modal-body').classList.add('animate__zoomIn'); // добавляем анимацию
+                for (i = 0; i < imgs.length; i++) { // перебираем все картинки
+                    let slideImg = document.createElement('img'); // создаем элементы img
+                    slideImg.setAttribute('src', ' ' + imgs[i].src + ' '); // в эти img передаем scr изображений
+                    slideImg.classList.add('slide-img'); // добавляем им класс .slide-img
+                    modalBody.append(slideImg); // и запихиваем эти изображения в модальное окно, чтобы сделать из них слайдер
+                }
+                goSlide(slideIndex); // вызываем работу слайдера с индексом, который соответствует индексу кликнутой картинки
+            });
+        });
+
+
+        function goSlide(n) {
+            let slides = document.querySelectorAll('.slide-img');
+            if (n > slides.length - 1) {
+                slideIndex = 0;
+            }
+            if (n < 0) {
+                slideIndex = slides.length - 1;
+            }
+            slides.forEach(elem => {
+                elem.style.display = 'none';
+                elem.classList.remove('animate__animated', 'animate__fadeIn');
+            });
+            slides[slideIndex].style.display = 'block';
+            slides[slideIndex].classList.add('animate__animated', 'animate__fadeIn');
+            modal.querySelector('.modal-body').classList.remove('animate__zoomOut');
+        }
+
+        function nextSlide(n) {
+            goSlide(slideIndex += n);
+        }
+        next.addEventListener('click', function () {
+            nextSlide(1);
+        });
+        prev.addEventListener('click', function () {
+            nextSlide(-1);
+        });
+
+        // закрытие окна по клику вне его
+        document.addEventListener('click', (e) => {
+            const target = e.target;
+            const itsModalBody = target.closest('.modal-body');
+            const itsWrapper = target.closest('.wrapper');
+            if (!itsModalBody && !itsWrapper && modal.classList.contains('modal--active')) {
+                modal.querySelector('.modal-body').classList.add('animate__zoomOut');
+                setTimeout(function () {
+                    modal.classList.remove('modal--active');
+                }, 500);
+                modalBody.innerHTML = '';
+            }
+        });
+    </script>
+
+</body>
+
+</html>
